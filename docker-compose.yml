@@ -46,6 +46,8 @@ services:
     ports:
       - "8080:8080"
     image: epam/ai-dial-core:development
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       'AIDIAL_SETTINGS': '/opt/settings/settings.json'
       'JAVA_OPTS': '-Dgflog.config=/opt/settings/gflog.xml'
@@ -60,8 +62,8 @@ services:
     volumes:
       - ./settings:/opt/settings
       - ${DIAL_DIR:-.}/core:/opt/config
-      - ${DIAL_DIR:-.}/core-logs/:/app/log
-      - ${DIAL_DIR:-.}/core-data/:/app/data
+      - /var/dial/core-logs/:/app/log
+      - /var/dial/core-data/:/app/data
 
   adapter-dial:
     image: epam/ai-dial-adapter-dial:development
@@ -149,3 +151,19 @@ services:
       - DDG_MCP_URL=http://ddg-search-mcp-server:8000/mcp
     volumes:
       - ./data:/app/data
+
+  # mas-coordinator:
+  #   depends_on:
+  #     - redis
+  #     - ums-agent
+  #     - general-purpose-agent
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8055:8055"
+  #   environment:
+  #     - DIAL_ENDPOINT=http://core:8080
+  #     - DEPLOYMENT_NAME=gpt-4o
+  #     - UMS_AGENT_ENDPOINT=http://ums-agent:8000
+  #     - LOG_LEVEL=INFO
